@@ -80,11 +80,11 @@ namespace storagecontroller
                 tickTime = Block.Attributes["tickTime"].AsInt(TickTime);
             }
 
-            if (Api is ICoreServerAPI ICoreServerAPI) 
+            if (Api is ICoreServerAPI ICoreServerAPI)
             {
-                RegisterGameTickListener(OnServerTick, TickTime); 
+                RegisterGameTickListener(OnServerTick, TickTime);
             }
-            else if (Api is ICoreClientAPI ICoreClientAPI) 
+            else if (Api is ICoreClientAPI ICoreClientAPI)
             {
                 RegisterGameTickListener(OnClientTick, 200);
             }
@@ -100,7 +100,7 @@ namespace storagecontroller
 
             IInventory playerInv = byPlayer.InventoryManager.GetInventory(GlobalConstants.characterInvClassName);
 
-            if (playerInv != null && playerInv.Empty) 
+            if (playerInv != null && playerInv.Empty)
             {
                 foreach (ItemSlot invSlots in playerInv)
                 {
@@ -427,13 +427,11 @@ namespace storagecontroller
 
             IPlayer byPlayer = (byEntity as EntityPlayer)?.Player;
 
-            if (blockEntity is BlockEntityContainer blockEntityContainer) 
+            if (blockEntity is BlockEntityContainer blockEntityContainer)
             {
                 // Should we let people do this?
 
                 if (blockEntityContainer is BlockEntityGroundStorage) { return; }
-
-                if (!IsInRange(blockSel.Position)) { return; }
 
                 //if container isn't on list then add it
 
@@ -683,20 +681,20 @@ namespace storagecontroller
             {
                 BlockPos blockPos = SerializerUtil.Deserialize<BlockPos>(data);
 
-                if (blockPos == null || blockPos == Pos) 
+                if (blockPos == null || blockPos == Pos)
                 {
-                    return; 
+                    return;
                 }
 
-                if (ContainerList == null) 
-                { 
-                    containerlist = new List<BlockPos>(); 
+                if (ContainerList == null)
+                {
+                    containerlist = new List<BlockPos>();
                 }
 
                 //do nothing if container in list
-                if (ContainerList.Contains(blockPos)) 
-                { 
-                    return; 
+                if (ContainerList.Contains(blockPos))
+                {
+                    return;
                 }
 
                 //don't link if container is reinforced
@@ -837,9 +835,11 @@ namespace storagecontroller
             Api.World.HighlightBlocks(byPlayer, 1, new List<BlockPos>());
             Api.World.HighlightBlocks(byPlayer, 2, new List<BlockPos>());
             Api.World.HighlightBlocks(byPlayer, 3, new List<BlockPos>());
+            Api.World.HighlightBlocks(byPlayer, 4, new List<BlockPos>());
+            Api.World.HighlightBlocks(byPlayer, 5, new List<BlockPos>());
         }
 
-        public void ToggleHighLight(IPlayer byPlayer,bool toggle)
+        public void ToggleHighLight(IPlayer byPlayer, bool toggle)
         {
             if (toggle)
             {
@@ -847,12 +847,13 @@ namespace storagecontroller
                 return;
             }
 
-            if(!toggle) 
+            if (!toggle)
             {
                 ClearHighlighted(byPlayer);
                 return;
             }
         }
+
 
         public void HighLightBlocks(IPlayer byPlayer)
         {
@@ -869,8 +870,8 @@ namespace storagecontroller
                 Api.World.HighlightBlocks(byPlayer, 1, ContainerList, colors, EnumHighlightBlocksMode.Absolute, EnumHighlightShape.Arbitrary);
             }
             else // Fixed for when there is one left it won't go away so we will do it like this instead.
-            if (ContainerList?.Count == 0) 
-            { 
+            if (ContainerList?.Count == 0)
+            {
                 Api.World.HighlightBlocks(byPlayer, 1, new List<BlockPos>());
             }
 
@@ -887,13 +888,42 @@ namespace storagecontroller
 
             colors[0] = ColorUtil.ColorFromRgba(255, 0, 255, 128);
 
-            List<BlockPos>storagecontroller= new List<BlockPos>
+            List<BlockPos> storagecontroller = new List<BlockPos>
             {
                 Pos
             };
 
             Api.World.HighlightBlocks(byPlayer, 3, storagecontroller, colors, EnumHighlightBlocksMode.Absolute, EnumHighlightShape.Arbitrary);
+
+            ItemStack itemStack = byPlayer.InventoryManager.ActiveHotbarSlot?.Itemstack;
+
+            if (itemStack?.Attributes?.HasAttribute("sigaltowerlinktoX") ?? false)
+            {
+
+               BlockPos sigalTowerPos = itemStack?.Attributes.GetBlockPos("sigaltowerlinkto");
+
+                List<BlockPos> sigalTowerRange = new List<BlockPos>
+                {
+                    new BlockPos(sigalTowerPos.X - 5, sigalTowerPos.Y - 5, sigalTowerPos.Z - 5, 0),
+                    new BlockPos(sigalTowerPos.X + 5, sigalTowerPos.Y + 5, sigalTowerPos.Z + 5, 0)
+                };
+
+                colors[0] = ColorUtil.ColorFromRgba(255, 200, 0, 128);
+
+                Api.World.HighlightBlocks(byPlayer, 4, sigalTowerRange, colors, EnumHighlightBlocksMode.Absolute, EnumHighlightShape.Cube);
+
+                colors[0] = ColorUtil.ColorFromRgba(255, 0, 255, 128);
+
+                List<BlockPos> sigaltower = new List<BlockPos>
+                {
+                    sigalTowerPos
+                };
+
+                Api.World.HighlightBlocks(byPlayer, 5, sigaltower, colors, EnumHighlightBlocksMode.Absolute, EnumHighlightShape.Arbitrary);
+            }
+
         }
+
 
         public enum enLinkTargets { ALL }
         /// <summary>

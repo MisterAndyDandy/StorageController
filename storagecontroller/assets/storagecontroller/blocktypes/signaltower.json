@@ -3,7 +3,6 @@
   "class": "BlockSignalTower",
   "entityclass": "SignalTower",
   "shape": { "base": "storagecontroller:block/sigaltower" },
-  "drawtype": "shape",
   "creativeinventory": {
     "general": [ "*" ],
     "decorative": [ "*" ]

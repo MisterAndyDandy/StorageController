@@ -16,7 +16,13 @@ namespace storagecontroller
     {
         public static string posValue = "linkto";
 
+        public static string posValueST = "sigaltowerlinkto";
+
         public static string linkedValue = "linktodesc";
+
+        public BlockEntityStorageController blockEntityStorageController = null;
+
+        public List<BlockPos> ListContainer = new List<BlockPos>();
 
         public WorldInteraction[] interactions;
 
@@ -91,17 +97,21 @@ namespace storagecontroller
             {
                 if (api is ICoreClientAPI)
                 {   // if player is pressing down ctrlkey and is looking at Storage Controller show high light blocks.
-                    if (targetEntity is BlockEntityStorageController blockEntityStorageController)
+                    if (targetEntity == blockEntityStorageController)
                     {
                         blockEntityStorageController.ShowHighLight = !blockEntityStorageController.ShowHighLight;
                         blockEntityStorageController.ToggleHighLight(entityPlayer.Player, blockEntityStorageController.ShowHighLight);
                         return;
                     }
 
-                    if (targetEntity is BlockEntitySignalTower) 
+                    if (targetEntity is BlockEntitySignalTower blockEntitySignalTower) 
                     {
-                        //add it own show highlight blocks.
-                        return;
+                        if (api.World.BlockAccessor.GetBlockEntity(blockEntitySignalTower.StorageControllerPos) == blockEntityStorageController) 
+                        {
+                            blockEntityStorageController.ShowHighLight = !blockEntityStorageController.ShowHighLight;
+                            blockEntityStorageController.ToggleHighLight(entityPlayer.Player, blockEntityStorageController.ShowHighLight);
+                            return;
+                        }
                     }
                 }
             }
@@ -122,21 +132,43 @@ namespace storagecontroller
                     return;
                 }
 
-                if (targetEntity is BlockEntitySignalTower blockEntitySignalTower) 
+                if (targetEntity is BlockEntitySignalTower)
                 {
-                    blockEntitySignalTower.StorageControllerPos = attributes.GetBlockPos(posValue);
-                    (api as ICoreClientAPI)?.ShowChatMessage($"Storage Controller is linked to {blockEntitySignalTower.Block.GetPlacedBlockName(api.World, blockEntitySignalTower.Pos)}");
+                    attributes.SetBlockPos(posValueST, (targetEntity as BlockEntitySignalTower)?.Pos);
+                    (targetEntity as BlockEntitySignalTower)?.StorageControllerPos.Set(attributes.GetBlockPos(posValue));
+                    slot.MarkDirty();
+                    (api as ICoreClientAPI)?.ShowChatMessage($"Storage Controller is linked to {(targetEntity as BlockEntitySignalTower)?.Block.GetPlacedBlockName(api.World, (targetEntity as BlockEntitySignalTower)?.Pos)}");
+                    return;
                 }
 
                 // Check for valid Type
-                BlockPos Pos = slot.Itemstack.Attributes.GetBlockPos(posValue);
+                BlockPos StorageControllerPos = slot.Itemstack.Attributes.GetBlockPos(posValue);
 
-                if (Pos == null)
-                    return;
+                // Check for singaltower
+                BlockPos SignalTowerPos = slot.Itemstack.Attributes.GetBlockPos(posValueST);
 
-                if (api.World.BlockAccessor.GetBlockEntity(Pos) is BlockEntityStorageController blockEntityStorageController)
+                if (SignalTowerPos != null || StorageControllerPos != null)
                 {
-                    blockEntityStorageController.ToggleContainer(byEntity, blockSel);
+                   blockEntityStorageController = api.World.BlockAccessor.GetBlockEntity(StorageControllerPos) as BlockEntityStorageController;
+
+                    if (blockEntityStorageController != null)
+                    {
+                        if (blockEntityStorageController.IsInRange(blockSel.Position))
+                        {
+                            blockEntityStorageController.ToggleContainer(byEntity, blockSel);
+                        }
+                    }
+
+                    if (SignalTowerPos != null && api.World.BlockAccessor.GetBlockEntity(SignalTowerPos) is BlockEntitySignalTower blockEntitySignalTower)
+                    {
+                        if (blockEntitySignalTower.StorageControllerPos == StorageControllerPos)
+                        {
+                            if (blockEntitySignalTower.IsInRange(blockSel.Position)) 
+                            {
+                                blockEntityStorageController.ToggleContainer(byEntity, blockSel);
+                            }
+                        }
+                    }
                 }
             }
         }

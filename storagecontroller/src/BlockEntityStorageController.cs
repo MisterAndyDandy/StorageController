@@ -11,9 +11,7 @@ using Vintagestory.API.Datastructures;
 using Newtonsoft.Json;
 using System.Reflection;
 using Vintagestory.API.Util;
-using Vintagestory.Server;
 using Vintagestory.API.Config;
-using Vintagestory.Common;
 
 namespace storagecontroller
 {
@@ -49,6 +47,8 @@ namespace storagecontroller
         public int MaxPlayerRange => MaxRange + MaxRange;
 
         //bool dopruning = false; //should invalid locations be moved every time?
+
+        public float lastSecondsPast;
 
         private GUIDialogStorageAccess clientDialog;
 
@@ -380,7 +380,6 @@ namespace storagecontroller
             }
         }
 
-        
         public bool IsPlayerInRange(BlockPos checkpos)
         {
             int xdiff = Math.Abs(Pos.X - checkpos.X);
@@ -424,43 +423,41 @@ namespace storagecontroller
         //add a container to the list of managed containers (usually called by a storage linker)
         public void AddContainer(EntityAgent byEntity, BlockSelection blockSel)
         {
-            //don't want to link to ourself!
-            if (blockSel.Position == Pos) { return; }
-
-            BlockEntityContainer blockEntityContainer = Api.World.BlockAccessor.GetBlockEntity(blockSel.Position) as BlockEntityContainer;
+            BlockEntity blockEntity = Api.World.BlockAccessor.GetBlockEntity(blockSel.Position);
 
             IPlayer byPlayer = (byEntity as EntityPlayer)?.Player;
 
-            // Should we let people do this?
-            if (blockEntityContainer is BlockEntityGroundStorage) { return; }
-
-            if (blockEntityContainer == null) { return; }
-
-
-            if (!IsInRange(blockSel.Position)) { return; }
-
-            //if container isn't on list then add it
-
-            if (ContainerList == null)
+            if (blockEntity is BlockEntityContainer blockEntityContainer) 
             {
-                containerlist = new List<BlockPos>();
-            }
+                // Should we let people do this?
 
-            if (!ContainerList.Contains(blockSel.Position))
-            {
-                ContainerList.Add(blockSel.Position);
+                if (blockEntityContainer is BlockEntityGroundStorage) { return; }
 
-                if (Api is ICoreClientAPI)
+                if (!IsInRange(blockSel.Position)) { return; }
+
+                //if container isn't on list then add it
+
+                if (ContainerList == null)
                 {
-                    HighLightBlocks(byPlayer);
+                    containerlist = new List<BlockPos>();
                 }
 
-                if (Api is ICoreServerAPI)
+                if (!ContainerList.Contains(blockSel.Position))
                 {
-                    Api.World.PlaySoundAt(new AssetLocation("game:sounds/effect/latch"), byPlayer);
-                }
+                    ContainerList.Add(blockSel.Position);
 
-                MarkDirty();
+                    if (Api is ICoreClientAPI)
+                    {
+                        HighLightBlocks(byPlayer);
+                    }
+
+                    if (Api is ICoreServerAPI)
+                    {
+                        Api.World.PlaySoundAt(new AssetLocation("game:sounds/effect/latch"), byPlayer);
+                    }
+
+                    MarkDirty();
+                }
             }
         }
 
@@ -550,6 +547,7 @@ namespace storagecontroller
             {
                 containerlist = new List<BlockPos>();
             }
+
             MarkDirty();
         }
 

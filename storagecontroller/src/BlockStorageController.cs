@@ -28,11 +28,11 @@ namespace storagecontroller
         }
         public override ItemStack OnPickBlock(IWorldAccessor world, BlockPos pos)
         {
-            BlockEntityStorageController forstm = world.BlockAccessor.GetBlockEntity(pos) as BlockEntityStorageController;
-            if (forstm != null)
+            BlockEntityStorageController blockEntityStorageController = world.BlockAccessor.GetBlockEntity(pos) as BlockEntityStorageController;
+            if (blockEntityStorageController != null)
             {
                 ItemStack itemStack = new ItemStack(world.BlockAccessor.GetBlock(pos), 1);
-                byte[] data = SerializerUtil.Serialize(forstm.ContainerList);
+                byte[] data = SerializerUtil.Serialize(blockEntityStorageController.ContainerList);
                 if (data != null)
                 {
                     itemStack.Attributes.SetBytes(BlockEntityStorageController.containerlistkey, data);

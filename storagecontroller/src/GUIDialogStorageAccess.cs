@@ -5,8 +5,6 @@ using System;
 using System.Linq;
 using Vintagestory.API.Config;
 using System.Collections.Generic;
-using System.Xml.Xsl;
-using Vintagestory.GameContent;
 using Vintagestory.API.Util;
 
 namespace storagecontroller
@@ -32,9 +30,9 @@ namespace storagecontroller
 
         public override void RenderInteractiveElements(float deltaTime)
         {
-            double num = GuiElement.scaled(GuiElementItemSlotGridBase.unscaledSlotPadding);
-            double num2 = GuiElement.scaled(GuiElementIcon.unscaledButtonSize);
-            double num3 = GuiElement.scaled(GuiElementIcon.unscaledButtonSize);
+            double num = scaled(GuiElementItemSlotGridBase.unscaledSlotPadding);
+            double num2 = scaled(GuiElementIcon.unscaledButtonSize);
+            double num3 = scaled(GuiElementIcon.unscaledButtonSize);
             int num4 = this.api.Input.MouseX - (int)this.Bounds.absX;
             int num5 = this.api.Input.MouseY - (int)this.Bounds.absY;
             Vec4f shadow = new Vec4f(0.231f, 0.188f, 0.145f, 1.0f);
@@ -142,7 +140,7 @@ namespace storagecontroller
                 entityStorageController = storageController;
             }
 
-            inventoryBin = new InventoryGeneric(1, "bin", "1", capi);
+            inventoryBin = new InventoryGeneric(1, "bin", "1" + BlockEntityPosition, capi);
 
             inventoryBin[0].BackgroundIcon = "trash-can";
 

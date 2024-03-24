@@ -50,6 +50,7 @@
   </Content>
   <None Remove="assets\game\lang\en.json" />
   <None Remove="assets\game\textures\icons\refresh.svg" />
+  <None Remove="assets\storagecontroller\blocktypes\signaltower.json" />
   <None Remove="assets\storagecontroller\blocktypes\storagecontrollerbismuthbronze.json" />
   <None Remove="assets\storagecontroller\blocktypes\storagecontrollerblackbronze.json" />
   <None Remove="assets\storagecontroller\blocktypes\storagecontrollercopper.json" />

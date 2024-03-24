@@ -1,0 +1,24 @@
+{
+  "code": "signaltower",
+  "class": "BlockSignalTower",
+  "entityclass": "SignalTower",
+  "shape": { "base": "storagecontroller:block/sigaltower" },
+  "drawtype": "shape",
+  "creativeinventory": {
+    "general": [ "*" ],
+    "decorative": [ "*" ]
+  },
+  "blockmaterial": "Metal",
+  "replaceable": 900,
+  "textures": {
+    "all": { "base": "block/metal/plate/iron" }
+  },
+  "resistance": 0.25,
+  "sideAo": { "all": false },
+  "sidesolid": {
+    "all": false
+  },
+  "sideopaque": {
+    "all": false
+  }
+}

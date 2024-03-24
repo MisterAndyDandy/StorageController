@@ -25,6 +25,9 @@ namespace StorageController
             api.RegisterItemClass("ItemStorageLinker", typeof(ItemStorageLinker));
             api.RegisterBlockClass("BlockStorageController", typeof(BlockStorageController));
 
+
+            api.RegisterBlockClass("BlockSignaltower", typeof(BlockSignalTower));
+            api.RegisterBlockEntityClass("Signaltower", typeof(BlockEntitySignalTower));
         }
 
         public override void StartClientSide(ICoreClientAPI api)

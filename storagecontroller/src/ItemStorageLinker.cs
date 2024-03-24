@@ -97,10 +97,16 @@ namespace storagecontroller
                         blockEntityStorageController.ToggleHighLight(entityPlayer.Player, blockEntityStorageController.ShowHighLight);
                         return;
                     }
+
+                    if (targetEntity is BlockEntitySignalTower) 
+                    {
+                        //add it own show highlight blocks.
+                        return;
+                    }
                 }
             }
             else
-            {   // If the block is a storage controller, set it as the target
+            {   // If the block is a storage controller or signal tower, set it as the target.
                 if (targetEntity is BlockEntityStorageController)
                 {
                     attributes.SetBlockPos(posValue, blockSel.Position);
@@ -116,17 +122,22 @@ namespace storagecontroller
                     return;
                 }
 
-                // Check for valid SCM
-                BlockPos StorageControllerPos = slot.Itemstack.Attributes.GetBlockPos(posValue);
-                if (StorageControllerPos == null)
+                if (targetEntity is BlockEntitySignalTower blockEntitySignalTower) 
+                {
+                    blockEntitySignalTower.StorageControllerPos = attributes.GetBlockPos(posValue);
+                    (api as ICoreClientAPI)?.ShowChatMessage($"Storage Controller is linked to {blockEntitySignalTower.Block.GetPlacedBlockName(api.World, blockEntitySignalTower.Pos)}");
+                }
+
+                // Check for valid Type
+                BlockPos Pos = slot.Itemstack.Attributes.GetBlockPos(posValue);
+
+                if (Pos == null)
                     return;
 
-                BlockEntityStorageController blockEntityStorageController = api.World.BlockAccessor.GetBlockEntity(StorageControllerPos) as BlockEntityStorageController;
-                if (blockEntityStorageController == null)
-                    return;
-
-
-                blockEntityStorageController.ToggleContainer(byEntity, blockSel);
+                if (api.World.BlockAccessor.GetBlockEntity(Pos) is BlockEntityStorageController blockEntityStorageController)
+                {
+                    blockEntityStorageController.ToggleContainer(byEntity, blockSel);
+                }
             }
         }
 
@@ -140,6 +151,7 @@ namespace storagecontroller
 
             return base.GetHeldItemName(itemStack);
         }
+
         public override WorldInteraction[] GetHeldInteractionHelp(ItemSlot inSlot)
         {
             return interactions.Append(base.GetHeldInteractionHelp(inSlot));
